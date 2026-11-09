@@ -152,7 +152,7 @@ h1 {
     justify-content: center;
     align-items: center;
     gap: 12px;
-    margin: 21px -20px 0;
+    margin: 70px -20px 0;
     font-size: 13px;
     font-style: italic;
     color: #9c8270
@@ -244,7 +244,7 @@ h1 {
 
     .envelope-caption {
         font-size: 11px;
-        margin-top: 15px;
+        margin-top: 50px;
         gap: 8px
     }
 
