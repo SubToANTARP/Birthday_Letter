@@ -247,15 +247,16 @@ let letterStarted = false;
 
 // A foreground pocket provides real occlusion as the folded sheet rises.
 // Copy existing artwork and reuse its gradients; add no replacement envelope.
+const envelopeSvg = envelope.querySelector('svg');
 const pocket = document.createElementNS(svgNS, 'svg');
-pocket.setAttribute('viewBox', '0 0 440 310');
+// Keep both layers aligned when the envelope's framing is adjusted for phones.
+pocket.setAttribute('viewBox', envelopeSvg.getAttribute('viewBox'));
 pocket.setAttribute('aria-hidden', 'true');
 pocket.classList.add('envelope-pocket-overlay');
 pocket.setAttribute('hidden', '');
 pocket.innerHTML = `<defs><clipPath id="pocket-occlusion"><path d="M20 40L220 190L420 40V286H20Z"/></clipPath></defs>`;
 const pocketPaint = document.createElementNS(svgNS, 'g');
 pocketPaint.setAttribute('clip-path', 'url(#pocket-occlusion)');
-const envelopeSvg = envelope.querySelector('svg');
 // Existing rect, bottom fold, seam highlights and addressee lettering.
 ['rect', 'path:nth-of-type(2)', 'path:nth-of-type(4)', 'text'].forEach(selector => {
  pocketPaint.append(envelopeSvg.querySelector(`:scope > ${selector}`).cloneNode(true));
