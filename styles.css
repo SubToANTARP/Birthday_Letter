@@ -300,6 +300,13 @@ h1 {
     display: none
 }
 
+.envelope-pocket-overlay>svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible
+}
+
 #birthday-letter {
     position: absolute;
     z-index: 2;

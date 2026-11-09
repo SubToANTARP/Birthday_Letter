@@ -248,20 +248,27 @@ let letterStarted = false;
 // A foreground pocket provides real occlusion as the folded sheet rises.
 // Copy existing artwork and reuse its gradients; add no replacement envelope.
 const envelopeSvg = envelope.querySelector('svg');
-const pocket = document.createElementNS(svgNS, 'svg');
+// Animate matching HTML containers, rather than an HTML envelope and a root
+// SVG: SVG transform origins can differ when its viewBox starts above zero.
+const pocket = document.createElement('div');
+const pocketSvg = document.createElementNS(svgNS, 'svg');
 // Keep both layers aligned when the envelope's framing is adjusted for phones.
-pocket.setAttribute('viewBox', envelopeSvg.getAttribute('viewBox'));
+pocketSvg.setAttribute('viewBox', envelopeSvg.getAttribute('viewBox'));
 pocket.setAttribute('aria-hidden', 'true');
 pocket.classList.add('envelope-pocket-overlay');
 pocket.setAttribute('hidden', '');
-pocket.innerHTML = `<defs><clipPath id="pocket-occlusion"><path d="M20 40L220 190L420 40V286H20Z"/></clipPath></defs>`;
+pocketSvg.innerHTML = `<defs><clipPath id="pocket-occlusion"><path d="M20 40L220 190L420 40V286H20Z"/></clipPath></defs>`;
 const pocketPaint = document.createElementNS(svgNS, 'g');
 pocketPaint.setAttribute('clip-path', 'url(#pocket-occlusion)');
 // Existing rect, bottom fold, seam highlights and addressee lettering.
+const pocketSourceParts = [];
 ['rect', 'path:nth-of-type(2)', 'path:nth-of-type(4)', 'text'].forEach(selector => {
- pocketPaint.append(envelopeSvg.querySelector(`:scope > ${selector}`).cloneNode(true));
+ const source = envelopeSvg.querySelector(`:scope > ${selector}`);
+ pocketPaint.append(source.cloneNode(true));
+ if (selector !== 'rect') pocketSourceParts.push(source);
 });
-pocket.append(pocketPaint);
+pocketSvg.append(pocketPaint);
+pocket.append(pocketSvg);
 envelopeScene.append(pocket);
 
 function renderFlap() {
@@ -275,6 +282,7 @@ function renderFlap() {
 function finishLetterReveal() {
  storybook.dataset.letterState = 'open';
  pocket.setAttribute('hidden', '');
+ pocketSourceParts.forEach(part => part.style.removeProperty('visibility'));
  gsap.set(envelopeScene, {clearProps:'left,transform'});
  gsap.set(letter, {clearProps:'left,top,bottom,width,height,maxHeight,transform',visibility:'visible'});
  gsap.set(letterScroll, {opacity:1});
@@ -317,6 +325,9 @@ function openBirthdayLetter() {
  gsap.set(letterScroll, {opacity:0});
  gsap.set(seal, {svgOrigin:'220 185'});
  pocket.removeAttribute('hidden');
+ // Hand the front artwork to the overlay while the paper passes between
+ // layers. Never paint a second address or second set of front folds below it.
+ pocketSourceParts.forEach(part => { part.style.visibility = 'hidden'; });
  openingTimeline = gsap.timeline({defaults:{ease:'power2.inOut'},onComplete:finishLetterReveal});
  openingTimeline
   .to([envelope,pocket], {y:-12,scale:1.025,duration:.65,ease:'sine.inOut'}, .15)
