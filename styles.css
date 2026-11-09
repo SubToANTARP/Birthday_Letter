@@ -439,7 +439,7 @@ h1 {
 
 @media(max-width:600px) {
     #birthday-letter {
-        top: 250px;
+        top: 177px;
         bottom: 104px;
         max-height: none;
         width: calc(100% - 154px)
